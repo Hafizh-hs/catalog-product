@@ -1,9 +1,32 @@
 import { useParams } from "react-router-dom";
-import products from "./data/products.json";
+// import products from "./data/products.json";
+
+import { useState, useEffect } from "react";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const product = products.find((product) => product.id === parseInt(id));
+  // const product = products.find((product) => product.id === parseInt(id));
+
+  // state
+  const [stock, setStock] = useState(0);
+  const [product, setProduct] = useState({});
+
+  useEffect(() => {
+    fetch(`https://dummyjson.com/products/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProduct(data);
+        setStock(data.stock);
+      });
+  }, []);
+
+  function addToCart() {
+    if (stock > 0) {
+      setStock(stock - 1);
+    } else {
+      alert("stock's Out'");
+    }
+  }
   return (
     <>
       <div className="row">
@@ -26,8 +49,7 @@ export default function ProductDetail() {
 
           <p>{product.description}</p>
           <p>
-            Stock :{" "}
-            <span className="fw-bold text-success">{product.stock}</span>
+            Stock : <span className="fw-bold text-success">{stock}</span>
           </p>
           <p className="d-flex justify-content-end align-items-center">
             <span className="fs-5 text-decoration-line-through me-2">
@@ -40,10 +62,15 @@ export default function ProductDetail() {
               )}
             </span>
           </p>
+          <div className="d-flex flex-row-reverse">
+            <button onClick={addToCart} className="btn btn-warning">
+              Add to Cart
+            </button>
+          </div>
         </div>
       </div>
       <div className="row pt-3 g-3">
-        {product.images.map((image, index) => (
+        {product.images?.map((image, index) => (
           <div className="col-md-3" key={index}>
             <img src={image} alt="" className="img-thumbnail w-100" />
           </div>
